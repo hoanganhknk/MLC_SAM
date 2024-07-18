@@ -37,7 +37,7 @@ parser.add_argument('--grad_clip', default=0.0, type=float, help='max grad norm 
 parser.add_argument('--momentum', default=0.9, type=float, help='momentum for optimizer')
 parser.add_argument('--main_lr', default=3e-4, type=float, help='lr for main net')
 parser.add_argument('--meta_lr', default=3e-5, type=float, help='lr for meta net')
-parser.add_argument('--optimizer', default='adam', type=str, choices=['adam', 'sgd', 'adadelta'])
+parser.add_argument('--optimizer', default='adam', type=str, choices=['adam', 'sgd', 'adadelta', 'sam'])
 parser.add_argument('--opt_eps', default=1e-8, type=float, help='eps for optimizers')
 #parser.add_argument('--tau', default=1, type=float, help='tau')
 parser.add_argument('--wdecay', default=5e-4, type=float, help='weight decay (default: 5e-4)')
