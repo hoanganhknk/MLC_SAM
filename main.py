@@ -155,6 +155,9 @@ def setup_training(main_net, meta_net, exp_id=None):
     # main net optimizer
     main_params = main_net.parameters() 
 
+    if args.optimizer == 'sam':
+        from sam import SAM
+        main_opt = SAM(main_params, torch.optim.SGD, lr=args.main_lr, momentum=args.momentum, weight_decay=args.wdecay)
     if args.optimizer == 'adam':
         main_opt = torch.optim.Adam(main_params, lr=args.main_lr, weight_decay=args.wdecay, amsgrad=True, eps=args.opt_eps)
     elif args.optimizer == 'sgd':
