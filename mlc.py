@@ -1,13 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+from SAM import *
 def _concat(xs):
     return torch.cat([x.view(-1) for x in xs])
 
 @torch.no_grad()
 def update_params(params, grads, eta, opt, args, deltaonly=False, return_s=False):
-    if isinstance(opt, torch.optim.SGD):
+    if isinstance(opt, torch.optim.SGD) or isinstance(opt, torch.optim.Adam) or isinstance(opt, SAM) :
         return update_params_sgd(params, grads, eta, opt, args, deltaonly, return_s)
     else:
         raise NotImplementedError('Non-supported main model optimizer type!')
@@ -20,12 +20,12 @@ def update_params_sgd(params, grads, eta, opt, args, deltaonly, return_s=False):
 
     if return_s:
         ss = []
-
+    if isinstance(opt, SAM):
+        opt = opt.base_optimizer
     wdecay = opt.defaults['weight_decay']
     momentum = opt.defaults['momentum']
     dampening = opt.defaults['dampening']
     nesterov = opt.defaults['nesterov']
-
     for i, param in enumerate(params):
         dparam = grads[i] + param * wdecay # s=1
         s = 1
