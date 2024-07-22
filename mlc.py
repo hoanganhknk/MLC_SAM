@@ -123,7 +123,21 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
 
     proxy_g.backward()
     def closure():
-        return proxy_g
+        logit_g = main_net(data_g)
+        loss_g  = hard_loss_f(logit_g, target_g)
+        gw_prime = torch.autograd.grad(loss_g, main_net.parameters())
+
+        # 3.5 compute discount factor gw_prime * (I-LH) * gw.t() / |gw|^2
+        tmp1 = [(1-Hw*dparam_s[i]) * gw_prime[i] for i in range(len(dparam_s))]
+        gw_norm2 = (_concat(gw).norm())**2
+        tmp2 = [gw[i]/gw_norm2 for i in range(len(gw))]
+        gamma = torch.dot(_concat(tmp1), _concat(tmp2))
+
+        # because of dparam_s, need to scale up/down f_params_grads_prime for proxy_g/loss_g
+        Lgw_prime = [ dparam_s[i] * gw_prime[i] for i in range(len(dparam_s))]     
+
+        proxy_g = -torch.dot(_concat(f_param_grads), _concat(Lgw_prime))
+        return proxy_g.backward
     # accumulate discounted iterative gradient
     for i, param in enumerate(meta_net.parameters()):
         if param.grad is not None:
@@ -138,7 +152,6 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
     for i, param in enumerate(main_net.parameters()):
         param.data = f_param[i]
         param.grad = f_param_grads[i].data
-        print(torch.sum(param.grad))
     main_opt.step(closure)
     return loss_g, loss_s
 
