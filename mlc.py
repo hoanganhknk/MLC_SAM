@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+torch.autograd.set_detect_anomaly(True)
 from SAM import *
 def _concat(xs):
     return torch.cat([x.view(-1) for x in xs])
@@ -119,7 +120,10 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
 
     # back prop on alphas
     meta_opt.zero_grad()
+
     proxy_g.backward()
+    def closure():
+        return proxy_g
     # accumulate discounted iterative gradient
     for i, param in enumerate(meta_net.parameters()):
         if param.grad is not None:
@@ -134,7 +138,7 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
     for i, param in enumerate(main_net.parameters()):
         param.data = f_param[i]
         param.grad = f_param_grads[i].data
-    main_opt.step(proxy_g)
-    
+        print(torch.sum(param.grad))
+    main_opt.step(closure)
     return loss_g, loss_s
 
