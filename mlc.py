@@ -69,8 +69,8 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
                 meta_net, meta_opt, soft_loss_f,
                 data_s, target_s, data_g, target_g,
                 data_c, target_c, 
-                eta, args):
-
+                eta, args): 
+    
     # compute gw for updating meta_net
     logit_g = main_net(data_g)
     loss_g = hard_loss_f(logit_g, target_g)
@@ -120,7 +120,6 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
     # back prop on alphas
     meta_opt.zero_grad()
     proxy_g.backward()
-    
     # accumulate discounted iterative gradient
     for i, param in enumerate(meta_net.parameters()):
         if param.grad is not None:
@@ -135,7 +134,7 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
     for i, param in enumerate(main_net.parameters()):
         param.data = f_param[i]
         param.grad = f_param_grads[i].data
-    main_opt.step()
+    main_opt.step(proxy_g)
     
     return loss_g, loss_s
 
