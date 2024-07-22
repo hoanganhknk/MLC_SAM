@@ -10,7 +10,7 @@ class MetaNet(nn.Module):
         self.args = args
 
         self.num_classes = num_classes        
-        self.in_class = self.num_classes 
+        self.in_class = self.num_classes
         self.hdim = h_dim
         self.cls_emb = nn.Embedding(self.in_class, cls_dim)
 

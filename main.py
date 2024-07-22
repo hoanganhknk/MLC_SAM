@@ -8,7 +8,6 @@ import os
 from logger import get_logger
 from tqdm import tqdm
 from collections import deque
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -20,6 +19,7 @@ from mlc_utils import clone_parameters, tocuda, DummyScheduler
 
 from models import *       
 from meta_models import *  
+from SAM import *
 
 parser = argparse.ArgumentParser(description='MLC Training Framework')
 parser.add_argument('--dataset', type=str, choices=['cifar10', 'cifar100', 'clothing1m'], default='cifar10')
@@ -154,10 +154,8 @@ def setup_training(main_net, meta_net, exp_id=None):
 
     # main net optimizer
     main_params = main_net.parameters() 
-
     if args.optimizer == 'sam':
-        from sam import SAM
-        main_opt = SAM(main_params, torch.optim.SGD, lr=args.main_lr, momentum=args.momentum, weight_decay=args.wdecay)
+        main_opt = SAM(main_params, torch.optim.SGD, rho=args.rho, adaptive=args.adaptive, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
     if args.optimizer == 'adam':
         main_opt = torch.optim.Adam(main_params, lr=args.main_lr, weight_decay=args.wdecay, amsgrad=True, eps=args.opt_eps)
     elif args.optimizer == 'sgd':
