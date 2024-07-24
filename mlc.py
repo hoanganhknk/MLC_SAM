@@ -119,15 +119,9 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
     proxy_g = -torch.dot(_concat(f_param_grads), _concat(Lgw_prime))
 
     # back prop on alphas
-    if isinstance(meta_opt, SAM):
-        def closure():
-            meta_opt.zero_grad()
-            proxy_g.backward()
-        meta_opt.step(closure)
-    else:
-        meta_opt.zero_grad()
-        proxy_g.backward()
-        meta_opt.step()
+    meta_opt.zero_grad()
+    
+    proxy_g.backward()
 
     # accumulate discounted iterative gradient
     for i, param in enumerate(meta_net.parameters()):
@@ -136,7 +130,13 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
             args.dw_prev[i] = param.grad.clone()
 
     if (args.steps+1) % (args.gradient_steps)==0: # T steps proceeded by main_net
-        meta_opt.step()
+        if isinstance(meta_opt, SAM):
+            def closure():
+                meta_opt.zero_grad()
+                proxy_g.backward()
+            meta_opt.step(closure)
+        else:
+            meta_opt.step()
         args.dw_prev = [0 for param in meta_net.parameters()] # 0 to reset 
 
     # modify to w, and then do actual update main_net
