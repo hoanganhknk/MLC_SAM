@@ -1,5 +1,5 @@
 import torch
-import utils
+import utils_sam
 import copy
 
 
@@ -101,11 +101,11 @@ def random_init_on_sphere_delta_dict(delta_dict, rho):
 
 
 def weight_ascent_step(model, f, orig_param_dict, delta_dict, step_size, rho, layer_name_pattern='all', no_grad_norm=False, verbose=False):
-    utils.zero_grad(model)
+    utils_sam.zero_grad(model)
     obj = f(model)  # grads are accumulated
     obj.backward()
 
-    grad_norm = utils.get_flat_grad(model).norm()
+    grad_norm = utils_sam.get_flat_grad(model).norm()
     if verbose:
         print('obj={:.3f}, grad_norm={:.3f}'.format(obj, grad_norm))
 
@@ -125,7 +125,7 @@ def weight_ascent_step(model, f, orig_param_dict, delta_dict, step_size, rho, la
     for param in model.parameters():
         param.data = orig_param_dict[param] + delta_dict[param]
 
-    utils.zero_grad(model)
+    utils_sam.zero_grad(model)
     return delta_dict
 
 

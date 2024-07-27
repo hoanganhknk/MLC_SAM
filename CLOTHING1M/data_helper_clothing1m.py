@@ -1,7 +1,7 @@
 import torch
 import torchvision
 import torchvision.transforms as transforms
-from utils import DataIterator
+from utils_sam import DataIterator
 
 def _fix_cls_to_idx(ds):
     for cls in ds.class_to_idx:
