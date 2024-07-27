@@ -6,7 +6,7 @@ import torchvision.datasets as dset
 import torchvision.transforms as transforms
 import numpy as np
 from PIL import Image
-from utils_sam import DataIterator
+from utils import DataIterator
 
 def prepare_data(gold_fraction, corruption_prob, corruption_type, args):
     if args.use_mwnet_loader:
