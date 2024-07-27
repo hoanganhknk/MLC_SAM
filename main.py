@@ -147,7 +147,9 @@ def setup_training(main_net, meta_net, exp_id=None):
     # ============== setting up from scratch ===================
     # set up optimizers and schedulers
     # meta net optimizer
-    optimizer = SAM(meta_net.parameters(), torch.optim.SGD, rho = 2.0, adaptive= 'True', lr=args.main_lr, momentum=args.momentum, weight_decay=args.wdecay)
+    optimizer = torch.optim.Adam(meta_net.parameters(), lr=args.meta_lr,
+                                 weight_decay=0, #args.wdecay, # meta should have wdecay or not??
+                                 amsgrad=True, eps=args.opt_eps)
     scheduler = DummyScheduler(optimizer)
 
     # main net optimizer
