@@ -139,9 +139,19 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
         param.grad = f_param_grads[i].data
     if isinstance(main_opt, SAM):
         main_opt.first_step(zero_grad=True)
-        logit_g = main_net(data_g)
-        loss_g = hard_loss_f(logit_g, target_g) 
-        loss_g.backward()   
+            # given current meta net, get corrected label
+        logit_s, x_s_h = main_net(data_s, return_h=True)
+        pseudo_target_s = meta_net(x_s_h.detach(), target_s)
+        loss_s = soft_loss_f(logit_s, pseudo_target_s)
+
+        if data_c is not None:
+            bs1 = target_s.size(0)
+            bs2 = target_c.size(0)
+
+            logit_c = main_net(data_c)
+            loss_s2 = hard_loss_f(logit_c, target_c)
+            loss_s = (loss_s * bs1 + loss_s2 * bs2 ) / (bs1+bs2)
+        loss_s.backward()
         main_opt.second_step(zero_grad=True)
     else :
         main_opt.step()
