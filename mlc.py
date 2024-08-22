@@ -154,6 +154,7 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
 
         f_params_new, dparam_s = update_params(main_net.parameters(), f_param_grads, eta, main_opt, args, return_s=True)
         f_param = []
+
         for i, param in enumerate(main_net.parameters()):
             f_param.append(param.data.clone())
             param.data = f_params_new[i].data # use data only as f_params_new has graph
