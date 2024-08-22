@@ -147,9 +147,9 @@ def step_hmlc_K(main_net, main_opt, hard_loss_f,
             bs1 = target_s.size(0)
             bs2 = target_c.size(0)
 
-        logit_c = main_net(data_c)
-        loss_s2 = hard_loss_f(logit_c, target_c)
-        loss_s = (loss_s * bs1 + loss_s2 * bs2 ) / (bs1+bs2)
+            logit_c = main_net(data_c)
+            loss_s2 = hard_loss_f(logit_c, target_c)
+            loss_s = (loss_s * bs1 + loss_s2 * bs2 ) / (bs1+bs2)
         f_param_grads = torch.autograd.grad(loss_s, main_net.parameters(), create_graph=True)    
 
         f_params_new, dparam_s = update_params(main_net.parameters(), f_param_grads, eta, main_opt, args, return_s=True)
